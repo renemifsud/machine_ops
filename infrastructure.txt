@@ -1,0 +1,10 @@
+Windows:
+3 application servers
+3 Storages 
+
+Linux:
+2 rabbits
+1 kafka
+2 loadbalancers
+
+

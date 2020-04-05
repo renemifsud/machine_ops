@@ -1,0 +1,5 @@
+User:
+    id
+    Username
+    password_hash
+    email

@@ -1,0 +1,46 @@
+version: "3"
+services:
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 7070:8080
+
+  db:
+    image: "postgres:9.6.5"
+    # volumes:
+    #   - "dbdata:/var/lib/postgresql/data"
+    env_file:
+      - env_file
+    networks:
+      - db_nw
+  flaskapp:
+    build: app
+    expose:
+      - "5000"
+    ports:
+      - "5050:5000"
+    volumes:
+      - ./app:/app/
+    networks:
+      - db_nw
+      - web_nw
+    depends_on:
+      - db
+  web:
+    container_name: nginx
+    build: www
+    ports:
+      - "9090:80"
+    command: nginx -g "daemon off";
+    networks:
+      - web_nw
+    depends_on:
+      - flaskapp
+networks:
+  db_nw:
+    driver: bridge
+  web_nw:
+    driver: bridge
+volumes:
+  dbdata:
