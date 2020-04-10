@@ -14,7 +14,10 @@ def create_app(config_name):
     ] = "postgresql://postgres:TestDBKey@localhost/machine_ops"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-    db = SQLAlchemy(app)
+    db.init_app(app)
+    
+    with app.app_context():
+        db.create_all()
 
 
     return app

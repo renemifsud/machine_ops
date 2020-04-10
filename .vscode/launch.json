@@ -15,7 +15,7 @@
             "name": "Python: Run File",
             "type": "python",
             "request": "launch",
-            "program": "/c/Users/renem/OneDrive - Middlesex University/Thesis/Code/machine_ops/app/run.py",
+            "program": "/home/rmifsud/Downloads/repos/machine_ops/app/run.py",
             "console": "integratedTerminal"
         }
     ]

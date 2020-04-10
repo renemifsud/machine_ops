@@ -12,8 +12,10 @@ services:
     #   - "dbdata:/var/lib/postgresql/data"
     env_file:
       - env_file
-    networks:
-      - db_nw
+    ports:
+      - "5432:5432"
+
+
   flaskapp:
     build: app
     expose:
@@ -22,19 +24,15 @@ services:
       - "5050:5000"
     volumes:
       - ./app:/app/
-    networks:
-      - db_nw
-      - web_nw
     depends_on:
       - db
+
   web:
     container_name: nginx
     build: www
     ports:
       - "9090:80"
     command: nginx -g "daemon off";
-    networks:
-      - web_nw
     depends_on:
       - flaskapp
 networks:

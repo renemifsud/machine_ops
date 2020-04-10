@@ -8,7 +8,6 @@ from api import create_app, db
 app = create_app("config")
 
 if __name__ == "__main__":
-    PORT = int(os.environ.get("PORT", 5000))
+    PORT = int(os.environ.get("PORT", 5010))
     app.run(host="127.0.0.1", port=PORT, debug=True)
-    db = SQLAlchemy(app)
-    db.create_all()
+    
