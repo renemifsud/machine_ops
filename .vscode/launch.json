@@ -8,14 +8,7 @@
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",
-            "program": "${file}",
-            "console": "integratedTerminal"
-        },
-        {
-            "name": "Python: Run File",
-            "type": "python",
-            "request": "launch",
-            "program": "/home/rmifsud/Downloads/repos/machine_ops/app/run.py",
+            "program": "/c/Users/renem/OneDrive/Desktop/machine_ops/run.py",
             "console": "integratedTerminal"
         }
     ]

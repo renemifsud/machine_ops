@@ -11,9 +11,9 @@ Content-Type: application/json
 ###
 GET http://127.0.0.1:8181/api/v1/users HTTP/1.1
 Content-Type: application/json
-Authorization: Basic eyJhbGciOiJIUzUxMiIsImlhdCI6MTU4NjUzMjYwNSwiZXhwIjoxNTg2NTM2MjA1fQ.eyJpZCI6MSwiaGFzaCI6InBia2RmMjpzaGEyNTY6MTUwMDAwJG1SWlc1YTl2JGY2NGIxNDVlNDk2ZjI0ZDBkN2JkODdjNDVmODAzY2E3ODFlMTc5YjAwZmJhNDc3NzczOWI5ZDQ5NmJiYTBiZTMifQ.ttYv0ZfXUi2tor4Fop3CIlkyH3jblGXwvCbO0cpQUT48meNtwOBnj6IR21MkibDZv49YLI9rUD2TatbUtSRY3A:
+Authorization: Basic eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwiZXhwIjoxNTg4MDgwMzM4fQ.bOFCQBAPR8qi62ez-I1iIT9PgRk61T7ZjmCf78B90yg:
 
 ###
-GET http://127.0.0.1:8181/get-auth-token HTTP/1.1
+GET http://127.0.0.1:5000/get-auth-token HTTP/1.1
 Content-Type: application/json
 Authorization: Basic renemifsud:renetest
