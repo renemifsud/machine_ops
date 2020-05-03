@@ -1,0 +1,28 @@
+
+POST http://127.0.0.1:5000/users HTTP/1.1
+Content-Type: application/json
+Authorization: Basic eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwiZXhwIjoxNTkzNDkyMzk2fQ.ZsbAlAERP_7eGeZERciAcTccRoZGiP57DIZTKYE2Yoc:
+
+
+{
+    "username": "renemifsud2",
+    "password": "renetest2",
+    "email": "renemifsud2@gmail.com"
+}
+
+###
+GET http://127.0.0.1:5000/users HTTP/1.1
+Content-Type: application/json
+Authorization: Basic eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwiZXhwIjoxNTkzNDkyMzk2fQ.ZsbAlAERP_7eGeZERciAcTccRoZGiP57DIZTKYE2Yoc:
+
+###
+GET http://127.0.0.1:5000/get-auth-token/5184000 HTTP/1.1
+Content-Type: application/json
+Authorization: Basic renemifsud:renetest
+
+
+
+####
+
+
+eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwiZXhwIjoxNTkzNDkyMzk2fQ.ZsbAlAERP_7eGeZERciAcTccRoZGiP57DIZTKYE2Yoc

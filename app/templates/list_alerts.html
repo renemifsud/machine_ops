@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block main_content %}
+
+<div class="list_table">
+    <h2>Alerts</h2>
+    <table class="table">
+        <thead class="thead-dark">
+            <tr>
+                <th>
+                    Alert Id
+                </th>
+                <th>
+                    User Id
+                </th>
+                <th>
+                    Solved
+                </th>
+                <th>
+
+                </th>
+            </tr>
+        </thead>
+        {% for alert in alerts %}
+        <tr>
+            <td>
+                {{ alert.id }}
+            </td>
+            <td>
+                {{ alert.user_id }}
+            </td>
+            <td>
+                {{ alert.solved }}
+            </td>
+            <td>
+                <a href="{{ alert.get_app_url('main.alert') }}">
+                    View
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+{% endblock %}

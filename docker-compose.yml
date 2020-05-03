@@ -15,29 +15,21 @@ services:
       - "postgres_data:/var/lib/postgresql/data"
     env_file:
       - env_file
-    expose:
-      - "5432"
-
-  web:
-    restart: always
-    container_name: nginx
-    build:
-      context: .
-      dockerfile: Dockerfile_Nginx
     ports:
-      - "8181:80"
-    command: nginx -g "daemon off";
-    depends_on:
-      - python_api
+      - 5432:5432
       
   python_api:
     container_name: python_api
     build:
       context: .
       dockerfile: Dockerfile_Flask
-    expose:
-      - "8000"
-    command: /usr/local/bin/gunicorn -w 1 -b :8000 app:app
+    environment:
+      - APP_CONFIG=production
+    volumes:
+      - static_folder:/usr/src/app/app/static
+    ports:
+      - "8000:8000"
+    command: /usr/local/bin/gunicorn -w 1 -b :8000 app:create_app()
     # command: tail -f /dev/null
     restart: always
     depends_on:
@@ -45,3 +37,4 @@ services:
 
 volumes:
   postgres_data:
+  static_folder:

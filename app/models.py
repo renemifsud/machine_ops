@@ -2,7 +2,7 @@ import json
 from app import db
 import datetime
 import jwt
-from flask import url_for, current_app
+from flask import url_for, current_app, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.errors.exceptions import ValidationError
 
@@ -10,19 +10,29 @@ from app.errors.exceptions import ValidationError
 class Alert(db.Model):
     __tablename__ = "alerts"
     id = db.Column(db.Integer, primary_key=True)
-    data = db.Column(db.String(1000), unique=False)
+    data = db.Column(db.String(2000), unique=False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), index=True)
+    solved = db.Column(db.Boolean, index=True)
 
     def get_url(self):
         return url_for("alerts.get_alert", id=self.id, _external=True)
 
+    def get_app_url(self, app_name):
+        return url_for(app_name, id=self.id, _external=True)
+
     def export_data(self):
-        return {"id": self.id, "user_id": self.user_id, "data": json.loads(self.data)}
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "data": json.loads(self.data),
+            "solved": self.solved,
+        }
 
     def check_import(self, data):
         try:
             self.user_id
             self.data = json.dumps(data)
+            self.solved = False
         except KeyError as err:
             raise ValidationError("The alert is not JSON Serialisable")
         return self
@@ -45,6 +55,9 @@ class User(db.Model):
 
     def get_url(self):
         return url_for("users.get_user", id=self.id, _external=True)
+
+    def get_app_url(self, app_name):
+        return url_for(app_name + ".get_user", id=self.id, _external=True)
 
     def export_data(self):
         return {"self_url": self.get_url(), "username": self.username}
