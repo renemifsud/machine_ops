@@ -12,6 +12,7 @@ from flask import (
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_bootstrap import Bootstrap
+import flask_whooshalchemy as wa
 
 
 db = SQLAlchemy()
@@ -37,7 +38,8 @@ def create_app():
         ],
         supports_credentials=True,
     )
-    from .models import User
+
+    from .models import User, Alert, Solution, Var_Group
 
     with app.app_context():
         db.init_app(app)
@@ -48,6 +50,11 @@ def create_app():
             u.set_password("renetest")
             db.session.add(u)
             db.session.commit()
+
+        wa.whoosh_index(app, User)
+        wa.whoosh_index(app, Alert)
+        wa.whoosh_index(app, Solution)
+        wa.whoosh_index(app, Var_Group)
 
     # authentication token route
     from app.auth import auth, verify_password

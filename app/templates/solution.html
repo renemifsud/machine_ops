@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block main_content %}
+
+
+{% if solution.name %}
+<h2>{{ solution.name }}</h2>
+{% else %}
+<h2>{{ solution.id }}</h2>
+{% endif %}
+
+
+<form method="POST" action="">
+    <div class="form-group row">
+        <label for="staticId" class="col-sm-2 col-form-label">Solution Id</label>
+        <div class="col-sm-10">
+            <input type="text" readonly class="form-control-plaintext" id="staticId" value="{{ solution.id }}">
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="staticName" class="col-sm-2 col-form-label">Name</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" id="staticName" value="{{ solution.name }}" name="name">
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="inputCreator" class="col-sm-2 col-form-label">Creator</label>
+        <div class="col-sm-10">
+            <input type="text" readonly class="form-control-plaintext" id="inputCreator" value="{{ solution.user_id }}">
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="inputPaybook" class="col-sm-2 col-form-label">Playbook</label>
+        <div class="col-sm-10">
+            <input type="textfield" class="form-control" id="inputPaybook" value="{{ solution.playbook }}"
+                name="playbook">
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="inputPaybook" class="col-sm-2 col-form-label">Variables</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" id="inputPaybook" value="{{ solution.var_list }}" name="var_list">
+        </div>
+    </div>
+    {% if not saved %}
+    <button class="btn btn-danger" type="submit">Update</button>
+    {% else %}
+    <button class="btn btn-success" type="submit">Update</button>
+    {% endif %}
+</form>
+{% endblock %}

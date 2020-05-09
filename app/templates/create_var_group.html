@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block main_content %}
+
+<form action="{{ url_for('main.create_var_group') }}" method="POST">
+    <div class="row form-group">
+        <h2>Create Variable Group</h2>
+    </div>
+    <div class="row form-group">
+        <form action="" method="post" class="row form-group">
+            {{ form.csrf_token }}
+
+            {{ form.solutions_list }}
+            <input type="submit" class="btn btn-dark" value="Load Variables">
+        </form>
+    </div>
+
+    {% if var_list %}
+    <form action="" method="post">
+        <div style="display: none;">
+        </div>
+        <div class="row form-group">
+            <label for="forGroupName">Name</label>
+            <input type="text" class="form-control" id="forGroupName" aria-describedby="nameforGroupName"
+                name="groupName">
+        </div>
+        {% for var in var_list %}
+        <div class="row form-group">
+            <label for="for{{ var }}">{{ var }}</label>
+            <input type="text" class="form-control" id="for{{ var }}" aria-describedby="name{{ var }}" name="{{ var }}">
+        </div>
+        {% endfor %}
+
+        {% if not saved %}
+        <button class="btn btn-danger" type="submit">Save</button>
+        {% else %}
+        <button class="btn btn-success" type="submit">Save</button>
+        {% endif %}
+    </form>
+    {% endif %}
+
+
+
+    {% endblock %}

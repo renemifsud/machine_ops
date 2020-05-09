@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block main_content %}
+
+<form action="{{ url_for('main.create_solution') }}" method="POST">
+    <h2>Create Solution</h2>
+    <div class="form-group">
+        <label for="forName">Name</label>
+        <input type="text" class="form-control" id="forName" aria-describedby="nameHelp" name="name">
+        <small id="nameHelp" class="form-text text-muted">Set any name for the solution</small>
+    </div>
+    <div class="form-group">
+        <label for="forData">Playbook</label>
+        <textarea class="form-control" id="forData" name="playbook" aria-describedby="dataHelp" rows="3"></textarea>
+        <small id="dataHelp" class="form-text text-muted">The data posted by the alert</small>
+    </div>
+    <div class="form-group">
+        <label for="forVars">Variables</label>
+        <input type="text" class="form-control" id="forName" aria-describedby="nameHelp" name="var_list">
+        <small id="nameHelp" class="form-text text-muted">Enter the variable names that are needed by the playbook
+            seperated by a comma</small>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+{% endblock %}

@@ -9,6 +9,6 @@ Authorization: Basic eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwiZXhwIjoxNT
 }
 
 ###
-GET http://127.0.0.1:5000/alerts HTTP/1.1
+GET http://127.0.0.1:8000/alerts HTTP/1.1
 Content-Type: application/json
 Authorization: Basic eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwiZXhwIjoxNTkzMzMwNTU3fQ.hrwhN2AFTFhTIBIRhDct-ATJEgWoKwqvT6pJOXY6_IM:

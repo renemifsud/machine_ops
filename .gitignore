@@ -4,3 +4,26 @@ venv
 api
 *.pyc
 app/__pycache__/__init__.cpython-37.pyc
+whoosh_index/Alert/_MAIN_13.toc
+whoosh_index/Alert/MAIN_0y4z9yp3e50qk09j.seg
+whoosh_index/Alert/MAIN_gakn6e4azemv0c3y.seg
+whoosh_index/Alert/MAIN_n7fg0m2zrneh59ka.seg
+whoosh_index/Alert/MAIN_WRITELOCK
+whoosh_index/Solution/_MAIN_4.toc
+whoosh_index/Solution/MAIN_aa3d2p25tr62put9.seg
+whoosh_index/Solution/MAIN_mnikrtfsxbzyakmi.seg
+whoosh_index/Solution/MAIN_ut32p77oeddsvuoh.seg
+whoosh_index/Solution/MAIN_vm3qu1lenorfmbhc.seg
+whoosh_index/Solution/MAIN_WRITELOCK
+whoosh_index/User/_MAIN_12.toc
+whoosh_index/User/MAIN_8o2nafbw2reh7032.seg
+whoosh_index/User/MAIN_27jg1v401ja2qoqp.seg
+whoosh_index/User/MAIN_WRITELOCK
+whoosh_index/Var_Group/_MAIN_2.toc
+whoosh_index/Var_Group/MAIN_fyh55kmtarjmbmo4.seg
+whoosh_index/Var_Group/MAIN_q76kuamwyjx5i3yl.seg
+whoosh_index/Var_Group/MAIN_WRITELOCK
+whoosh.txt
+alerts main.txt
+alerts ideas
+app/__pycache__/__init__.cpython-37.pyc

@@ -2,11 +2,11 @@
 
 {% block main_content %}
 <div class="row">
-    <h2 class="col-sm-3">Alerts</h2>
-    <form class="col-sm-5" action="{{ url_for('main.create_alert') }}" method="GET" style="text-align: left;">
+    <h2 class="col-sm-3">Solutions</h2>
+    <form class="col-sm-5" action="{{ url_for('main.create_solution') }}" method="GET" style="text-align: left;">
         <input type="submit" class="btn btn-outline-success" value="&#43;">
     </form>
-    <form class="col-sm-3" action="{{ url_for('main.search_alerts') }}" method="POST" id="queryForm"
+    <form class="col-sm-3" action="{{ url_for('main.search_solutions') }}" method="POST" id="queryForm"
         style="text-align: right;">
         <input type="text" class="form-control" name="query" id="query">
     </form>
@@ -19,32 +19,32 @@
         <thead class="thead-dark">
             <tr>
                 <th>
-                    Alert Id
+                    Solution Id
                 </th>
                 <th>
-                    User Id
+                    Name
                 </th>
                 <th>
-                    Solved
+                    Creator
                 </th>
                 <th>
 
                 </th>
             </tr>
         </thead>
-        {% for alert in alerts %}
+        {% for solution in solutions %}
         <tr>
             <td>
-                {{ alert.id }}
+                {{ solution.id }}
             </td>
             <td>
-                {{ alert.user_id }}
+                {{ solution.name }}
             </td>
             <td>
-                {{ alert.solved }}
+                {{ solution.user_id }}
             </td>
             <td>
-                <a href="{{ alert.get_app_url() }}">
+                <a href="{{ solution.get_app_url() }}">
                     View
                 </a>
             </td>

@@ -9,3 +9,5 @@ COPY config /usr/src/app/config
 RUN pip install --upgrade pip && \
     pip install -r requirements.txt
 
+COPY flask_whooshalchemy.py /usr/local/lib/python3.7/site-packages/flask_whooshalchemy.py
+
