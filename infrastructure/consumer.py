@@ -7,8 +7,8 @@ credentials = pika.PlainCredentials('admin', 'iYm8SXYAy6rSPW4umRFS')
 def consume():
     connection = pika.BlockingConnection(pika.ConnectionParameters(RABBITMQ, credentials=credentials))
     channel = connection.channel()
-    channel.queue_declare(queue='hello')
-    channel.basic_consume(queue='hello',
+    channel.queue_declare(queue=sys.argv[1])
+    channel.basic_consume(queue=sys.argv[1],
                       auto_ack=True,
                       on_message_callback=callback)
     
