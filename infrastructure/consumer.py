@@ -1,5 +1,6 @@
 import pika
 import time
+import sys
 
 RABBITMQ = "95.217.184.176"
 credentials = pika.PlainCredentials('admin', 'iYm8SXYAy6rSPW4umRFS')
@@ -17,7 +18,6 @@ def consume():
 
 def callback(ch, method, properties, body):
     print(" [x] Received %r" % body)
-    time.sleep(2)
 
 if __name__ == "__main__":
     consume()
