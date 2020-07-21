@@ -18,6 +18,7 @@ def consume():
 
 def callback(ch, method, properties, body):
     print(" [x] Received %r" % body)
+    time.sleep(0.5)
 
 if __name__ == "__main__":
     consume()
