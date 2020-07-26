@@ -9,16 +9,27 @@
         <input type="text" class="form-control" id="forName" aria-describedby="nameHelp" name="name">
         <small id="nameHelp" class="form-text text-muted">Set any name for the solution</small>
     </div>
-    <div class="form-group">
-        <label for="forData">Playbook</label>
-        <textarea class="form-control" id="forData" name="playbook" aria-describedby="dataHelp" rows="3"></textarea>
-        <small id="dataHelp" class="form-text text-muted">The data posted by the alert</small>
+    <div class="form-group row">
+        <label for="var_playbook" class="col-sm-4 col-form-label">Playbook</label>
+        <div class="col-sm-8" form="updateUserForm">
+            {% if playbook %}
+            <input type="text" readonly class="form-control-plaintext" id="var_playbook" value="{{ playbook.name }}">
+            <input type="button" class="btn btn-dark" value="Change" id="var_playbook_button">
+            {% else %}
+            <input type="button" class="btn btn-dark" value="Change" id="var_playbook_button">
+            {% endif %}
+        </div>
     </div>
-    <div class="form-group">
-        <label for="forVars">Variables</label>
-        <input type="text" class="form-control" id="forName" aria-describedby="nameHelp" name="var_list">
-        <small id="nameHelp" class="form-text text-muted">Enter the variable names that are needed by the playbook
-            seperated by a comma</small>
+    <div class="form-group row">
+        <label for="var_var_group" class="col-sm-4 col-form-label">Variable Group</label>
+        <div class="col-sm-8" form="updateUserForm">
+            {% if var_group %}
+            <input type="text" readonly class="form-control-plaintext" id="var_var_group" value="{{ playbook.name }}">
+            <input type="button" class="btn btn-dark" value="Change" id="var_var_group_button">
+            {% else %}
+            <input type="button" class="btn btn-dark" value="Change" id="var_var_group_button">
+            {% endif %}
+        </div>
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>
 </form>

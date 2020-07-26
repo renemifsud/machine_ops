@@ -4,4 +4,3 @@ from wtforms import TextAreaField
 
 class CreateAlert(FlaskForm):
     data = TextAreaField()
-

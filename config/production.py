@@ -8,3 +8,4 @@ IGNORE_AUTH = False
 SECRET_KEY = "top-secret!"
 SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL") or "postgresql://" + db_path
 SQLALCHEMY_TRACK_MODIFICATIONS = True
+JSONIFY_PRETTYPRINT_REGULAR = True

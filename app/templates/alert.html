@@ -1,14 +1,30 @@
 {% extends "base.html" %}
 
 {% block main_content %}
+<div class="row">
+    <div class="col-sm">
+        {% if alert.name %}
+        <h2>{{ alert.name }}</h2>
+        {% else %}
+        <h2>{{ alert.id }}</h2>
+        {% endif %}
+    </div>
+    <div class="col-sm">
 
-{% if alert.name %}
-<h2>{{ alert.name }}</h2>
-{% else %}
-<h2>{{ alert.id }}</h2>
-{% endif %}
-
-<form method="POST" action="">
+    </div>
+    <div class="col-sm" style="text-align: center;">
+        {% if alert.solved %}
+        <div class="alert alert-dark" role="alert">
+            <strong>SOLVED</strong>
+        </div>
+        {% else %}
+        <div class="alert alert-danger" role="alert">
+            <strong>FIRING</strong>
+        </div>
+        {% endif %}
+    </div>
+</div>
+<form name="updateUserForm" method="POST" action="">
     <div class="form-group row">
         <label for="staticId" class="col-sm-2 col-form-label">Alert Id</label>
         <div class="col-sm-10">
@@ -30,23 +46,26 @@
     <div class="form-group row">
         <label for="staticData" class="col-sm-2 col-form-label">Data</label>
         <div class="col-sm-10">
-            <input type="text" class="form-control" id="staticData" value="{{ data }}" name="data">
+            <textarea type="text" class="form-control" id="staticData" name="data" rows="10">{{ alert.data }}</textarea>
         </div>
     </div>
     <div class="form-group row">
-        <label for="staticData" class="col-sm-2 col-form-label">Solution</label>
-        <form action="" method="post" class="col-sm-10">
-            {{ form.csrf_token }}
-
-            {{ form.solutions_list }}
-            <input type="submit" class="btn btn-dark" value="Select">
-        </form>
+        <label for="staticSolution" class="col-sm-2 col-form-label">Solution</label>
+        <div class="col-sm-10" form="updateUserForm">
+            {% if solution %}
+            <input type="text" readonly class="form-control-plaintext" id="staticSolution" value="{{ solution.name }}">
+            <input type="button" class="btn btn-dark" value="Change" id="solution_button">
+            {% else %}
+            <input type="button" class="btn btn-dark" value="Change" id="solution_button">
+            {% endif %}
+        </div>
     </div>
 
     {% if not saved %}
-    <button class="btn btn-danger" type="submit">Update</button>
+    <div name='alertUpdateBtn' id='alertUpdateBtn' class="btn btn-danger">Update</div>
     {% else %}
-    <button class="btn btn-success" type="submit">Update</button>
+    <div name='alertUpdateBtn' id='alertUpdateBtn' class="btn btn-success">Update</div>
     {% endif %}
 </form>
+</div>
 {% endblock %}

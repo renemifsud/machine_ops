@@ -14,43 +14,32 @@
         <button type="submit" class="btn btn-outline-primary" form="queryForm">&#63;</button>
     </div>
 </div>
-<div class="list_table">
-    <table class="table">
-        <thead class="thead-dark">
-            <tr>
-                <th>
-                    Alert Id
-                </th>
-                <th>
-                    User Id
-                </th>
-                <th>
-                    Solved
-                </th>
-                <th>
+<div>
+    {% for alert in alerts %}
+    {% if alert.solved == False %}
+    <div class="alert alert-danger" role="alert">
+        {% else %}
+        <div class="alert alert-secondary" role="alert">
+            {% endif %}
+            <div class="row">
+                <div class="col-sm">
+                    <p class="h2">
+                        <a href="{{ alert.get_app_url() }}" class="alert-link">{{ alert.name }}</a>
+                    </p>
+                </div>
 
-                </th>
-            </tr>
-        </thead>
-        {% for alert in alerts %}
-        <tr>
-            <td>
-                {{ alert.id }}
-            </td>
-            <td>
-                {{ alert.user_id }}
-            </td>
-            <td>
-                {{ alert.solved }}
-            </td>
-            <td>
-                <a href="{{ alert.get_app_url() }}">
-                    View
-                </a>
-            </td>
-        </tr>
+                <div class="col-sm">
+                    <div style="text-align: right;"><a href="{{ alert.get_app_url() }}"><i class="fa fa-wrench"
+                                aria-hidden="true"></i></a>
+                        <div style="text-align: right;"><a href="{{ alert.get_app_url() }}"><i
+                                    class="fas fa-eye"></i></a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
         {% endfor %}
-    </table>
-</div>
+    </div>
 
-{% endblock %}
+    {% endblock %}

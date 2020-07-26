@@ -13,17 +13,18 @@ from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_bootstrap import Bootstrap
 import flask_whooshalchemy as wa
-
+from flask_apscheduler import APScheduler
+from awx import AwxController
 
 db = SQLAlchemy()
+awx = None
 
 
 def get_config_file(config_name):
     return os.path.join(os.getcwd(), "config", config_name + ".py")
 
 
-def create_app():
-    config_name = os.environ.get("APP_CONFIG", "development")
+def create_app(config_name):
     app = Flask(__name__)
     Bootstrap(app)
     app.config.from_pyfile(get_config_file(config_name))
@@ -39,7 +40,7 @@ def create_app():
         supports_credentials=True,
     )
 
-    from .models import User, Alert, Solution, Var_Group
+    from .models import User, Alert, Solution, Playbook, VariableGroup, Variable
 
     with app.app_context():
         db.init_app(app)
@@ -54,10 +55,16 @@ def create_app():
         wa.whoosh_index(app, User)
         wa.whoosh_index(app, Alert)
         wa.whoosh_index(app, Solution)
-        wa.whoosh_index(app, Var_Group)
+        wa.whoosh_index(app, Playbook)
+        wa.whoosh_index(app, VariableGroup)
+        wa.whoosh_index(app, Variable)
+
+    scheduler = APScheduler()
+    scheduler.init_app(app)
+    scheduler.start()
 
     # authentication token route
-    from app.auth import auth, verify_password
+    from app.auth import auth, auth_token, verify_password
 
     @app.route("/", methods=["GET"])
     def app_root():
@@ -98,5 +105,15 @@ def create_app():
     from app.alerts.routes import alerts as alerts_bp
 
     app.register_blueprint(alerts_bp, url_prefix="/")
+
+    from app.solutions.routes import solutions as solutions_bp
+
+    app.register_blueprint(solutions_bp, url_prefix="/")
+
+    from app.playbooks.routes import playbooks as playbooks_bp
+
+    app.register_blueprint(playbooks_bp, url_prefix="/")
+
+    # Jobs
 
     return app

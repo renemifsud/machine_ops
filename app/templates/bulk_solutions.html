@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block main_content %}
+<form class="md-form" action="{{ url_for('main.bulk_solutions') }}" method="post" enctype="multipart/form-data">
+    <h2>Import Solutions</h2>
+    <div class="file-field">
+        <div class="btn btn-primary btn-sm float-left">
+            <span>.csv </span>
+            <input type="file" name="csv">
+        </div>
+        <div class="file-path-wrapper">
+        </div>
+        <button type="submit" class="btn btn-primary">Upload</button>
+    </div>
+</form>
+{% endblock %}

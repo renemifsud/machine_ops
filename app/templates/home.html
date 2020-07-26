@@ -4,4 +4,20 @@
 
 <p class="info">Welcome to Machine_Ops</p>
 
+<div class="container">
+    <div class="row">
+        <div class="col-sm alert">
+            <h2>Firing Alerts</h2>
+            {% for alert in alerts %}
+            {% if not alert.solved %}
+            <div class="alert alert-danger fade show" role="alert">
+                <p class="h2"> <a href="{{ alert.get_app_url() }}">{{ alert.name }}</a></p>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+        <div class="col-sm alert">
+        </div>
+    </div>
+</div>
 {% endblock %}

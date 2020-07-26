@@ -1,10 +1,10 @@
-venv
-*__pycache__*
-.vscode
+*venv*
+*pycache*
+*.vscode*
 api
 *.pyc
 app/__pycache__/__init__.cpython-37.pyc
-whoosh_index/Alert/_MAIN_13.toc
+*whoosh_index*
 whoosh_index/Alert/MAIN_0y4z9yp3e50qk09j.seg
 whoosh_index/Alert/MAIN_gakn6e4azemv0c3y.seg
 whoosh_index/Alert/MAIN_n7fg0m2zrneh59ka.seg

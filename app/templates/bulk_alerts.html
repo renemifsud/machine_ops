@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block main_content %}
+<form class="md-form" action="{{ url_for('main.bulk_alerts') }}" method="post" enctype="multipart/form-data">
+    <h2>Import Alerts</h2>
+    <div class="file-field">
+        <div class="btn btn-primary btn-sm float-left">
+            <span>.csv</span>
+            <input type="file" name="csv">
+        </div>
+        <div class="file-path-wrapper">
+        </div>
+        <button type="submit" class="btn btn-primary">Upload</button>
+    </div>
+    {% if upload_failed %}
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <strong></strong>
+    </div>
+    {% endif %}
+
+    <script>
+        $(".alert").alert();
+    </script>
+</form>
+
+{% endblock %}

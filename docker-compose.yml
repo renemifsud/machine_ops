@@ -12,12 +12,12 @@ services:
     container_name: postgres_db
     image: "postgres:9.6.17"
     volumes:
-      - "postgres_prod_data:/var/lib/postgresql/data"
+      - "test_talla:/var/lib/postgresql/data"
     env_file:
       - env_file
     ports:
       - 5432:5432
-      
+
   python_api:
     container_name: python_api
     build:
@@ -34,5 +34,9 @@ services:
       - db
 
 volumes:
-  postgres_data:
+  postgres_test_data:
   postgres_prod_data:
+  postgres_test:
+  test_tsest:
+  test_tsest2:
+  test_talla:

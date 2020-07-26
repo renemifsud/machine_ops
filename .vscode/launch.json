@@ -10,6 +10,13 @@
             "request": "launch",
             "program": "/root/machine_ops/run.py",
             "console": "integratedTerminal"
+        },
+        {
+            "name": "Python: Publisher",
+            "type": "python",
+            "request": "launch",
+            "program": "/root/machine_ops/infrastructure/master_publisher.py",
+            "console": "integratedTerminal"
         }
     ]
 }

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block main_content %}
+<div class="row">
+    <h2 class="col-sm-3">Playbooks</h2>
+</div>
+<div class="list_table">
+    <table class="table">
+        <thead class="thead-dark">
+            <tr>
+                <th>
+                    Playbook Id
+                </th>
+                <th>
+                    Name
+                </th>
+                <th>
+                    Creator
+                </th>
+                <th>
+
+                </th>
+            </tr>
+        </thead>
+        {% for playbook in playbooks %}
+        <tr>
+            <td>
+                {{ playbook.id }}
+            </td>
+            <td>
+                {{ playbook.name }}
+            </td>
+            <td>
+                {{ playbook.created_by }}
+            </td>
+            <td>
+                <a href="{{ playbook.get_app_url() }}">
+                    View
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+{% endblock %}
