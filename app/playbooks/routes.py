@@ -14,7 +14,7 @@ def before_request():
     pass
 
 
-@playbooks.route("/playbooks", methods=["GET", "POST"])
+@playbooks.route("/playbooks/", methods=["GET", "POST"])
 def get_playbooks():
     if request.method == "GET":
         if request.args:
@@ -54,7 +54,12 @@ def get_playbook(id):
     playbook = Playbook.query.get_or_404(id)
     if request.method == "GET":
         return jsonify(
-            playbook.name, playbook.template_url, playbook.extra_vars, playbook.created
+            {
+                "name": playbook.name,
+                "url": playbook.template_url,
+                "extra_vars": playbook.extra_vars,
+                "created": playbook.created,
+            }
         )
     elif request.method == "DELETE":
         db.session.delete(playbook)

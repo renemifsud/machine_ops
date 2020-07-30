@@ -33,6 +33,7 @@ class Alert(db.Model):
             "solved": self.solved,
             "solution_id": self.solution_id,
             "name": self.name,
+            "location": self.get_app_url()
         }
 
     def check_import(self, data, name=None, solution_id=None, solved=False):
@@ -174,6 +175,7 @@ class Playbook(db.Model):
     __tablename__ = "playbooks"
     id = db.Column(db.Integer, primary_key=True)
     template_url = db.Column(db.String(200), nullable=False, unique=True, index=True)
+    job_id = db.Column(db.Integer, nullable=False, unique=True, index=True)
     name = db.Column(db.String(200), unique=False)
     extra_vars = db.Column(db.String(200), unique=False)
     created = db.Column(UtcDateTime(), nullable=False, default=utcnow())
@@ -185,13 +187,13 @@ class Playbook(db.Model):
     inventory_name = db.Column(db.String(200), unique=False)
 
     solution = db.relationship("Solution", backref="playbook", uselist=False)
-    __searchable__ = ["id", "name", "template_url"]
+    __searchable__ = ["id", "name", "template_url", "job_id"]
 
     def get_url(self):
-        return url_for("solutions.get_solution", id=self.id, _external=True)
+        return url_for("playbooks.get_playbook", id=self.id, _external=True)
 
     def get_app_url(self):
-        return url_for("main.get_solution", id=self.id, _external=True)
+        return url_for("main.get_playbook", id=self.id, _external=True)
 
     def export_data(self):
         return {
@@ -220,6 +222,7 @@ class Playbook(db.Model):
                 self.modified = None
 
             self.template_url = obj["url"]
+            self.job_id = self.template_url.replace("/api/v2/job_templates/", "")[:-1]
             self.verbosity_level = obj["verbosity"]
             self.created_by = obj["summary_fields"]["created_by"]["username"]
             self.inventory = obj["summary_fields"]["inventory"]["name"]
@@ -249,7 +252,7 @@ class VariableGroup(db.Model):
     name = db.Column(db.String(200), unique=False)
     created = db.Column(UtcDateTime(), nullable=False, default=utcnow())
     modified = db.Column(UtcDateTime(), nullable=False, default=utcnow())
-    
+
     variables = db.relationship("Variable", backref="parent_group", uselist=False)
     __searchable__ = ["id", "name", "solution_id"]
 

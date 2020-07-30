@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block main_content %}
+<form class="md-form" enctype="multipart/form-data">
+    <h2>Select Alerts</h2>
+    <div class="form-group">
+        <label for="selectAlertsQuery">Select all alerts containing:</label>
+        <input type="text" class="form-control" id="selectAlertsQuery" aria-describedby="nameHelp" name="name">
+        <small id="nameHelp" class="form-text text-muted">Set a string that is found in the alerts needed</small>
+
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-2">
+                    <button type="button" id="alert_bulk_select" class="btn btn-primary">Search</button>
+                </div>
+                <div class="col-sm-8" style="text-align: center;">
+                    <button type="button" style="display:none;" id="alert_bulk_select_solution"
+                        class="btn btn-success">Set Solution
+                    </button>
+                </div>
+                <div class="col-sm-2" style="text-align: right;">
+                    <button type="button" style="display:none;" id="alert_bulk_select_export" class="btn btn-success"><i
+                            class="fa fa-download" aria-hidden="true"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% if alerts %}
+    {% for alert in alerts %}
+    <h2>{{ alert.id }}</h2>
+    {% endfor %}
+    {% endif %}
+</form>
+
+{% endblock %}

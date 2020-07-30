@@ -5,16 +5,19 @@ from flask import (
     current_app,
     g,
     request,
+    Response,
     make_response,
     redirect,
     jsonify,
     url_for,
+    make_response,
 )
 from app import db
 from app.models import User, Alert, Solution, Playbook, VariableGroup
 from app.alerts.forms import CreateAlert
 import json, csv
 from sqlalchemy import exc
+from io import StringIO
 
 main = Blueprint("main", __name__)
 
@@ -132,11 +135,51 @@ def bulk_alerts():
             return render_template("bulk_alerts.html", selected="alerts", uploaded=True)
 
 
-@main.route("/solutions", methods=["GET"])
-def list_solutions():
+@main.route("/alerts/bulk_select", methods=["GET"])
+def bulk_select_alerts():
     solutions = Solution.query.all()
-    return render_template(
-        "list_solutions.html", solutions=solutions, selected="solutions"
+    if request.method == "GET":
+        return render_template(
+            "bulk_select_alerts.html",
+            session=session["token"],
+            solutions=solutions,
+            selected="alerts",
+            uploaded=False,
+        )
+
+
+@main.route("/alerts/bulk_select/download", methods=["POST"])
+def bulk_select_alerts_download():
+    alerts = json.loads(request.form["alerts"])
+
+    alerts_obj_li = []
+    for alert in alerts:
+        alerts_obj_li.append(Alert.query.filter_by(id=alert))
+
+    "Export a CSV of all sales data"
+    output = StringIO()
+    writer = csv.writer(output)
+    line = ["id", "data", "user_id", "name", "solution_id"]
+    writer.writerow(line)
+    for alert in alerts:
+        alert = Alert.query.filter_by(id=alert).first()
+        line = [
+            str(alert.id)
+            ,
+            str(alert.data)
+            ,
+            str(alert.user_id)
+            ,
+            str(alert.name)
+            ,
+            str(alert.solution_id)
+        ]
+        writer.writerow(line)
+    output.seek(0)
+    return Response(
+        output,
+        mimetype="text/csv",
+        headers={"Content-Disposition": "attachment;filename=employee_report.csv"},
     )
 
 
@@ -145,6 +188,30 @@ def list_playbooks():
     playbooks = Playbook.query.all()
     return render_template(
         "list_playbooks.html", playbooks=playbooks, selected="playbooks"
+    )
+
+
+@main.route("/playbooks/<int:id>", methods=["GET", "POST"])
+def get_playbook(id):
+    playbook = Playbook.query.get_or_404(id)
+    if request.method == "GET":
+        if playbook:
+            return render_template("playbook.html", playbook=playbook)
+    if request.method == "POST":
+        playbook = Playbook.query.filter_by(id=id).first()
+        playbook.check_import_app(
+            request.form["name"], request.form["playbook"], request.form["var_list"]
+        )
+        db.session.add(playbook)
+        db.session.commit()
+        return render_template("playbook.html", playbook=playbook, saved=True)
+
+
+@main.route("/solutions", methods=["GET"])
+def list_solutions():
+    solutions = Solution.query.all()
+    return render_template(
+        "list_solutions.html", solutions=solutions, selected="solutions"
     )
 
 
@@ -166,9 +233,15 @@ def get_solution(id):
 
 @main.route("/solutions/create", methods=["GET", "POST"])
 def create_solution():
+    playbooks = Playbook.query.all()
+    var_groups = VariableGroup.query.all()
     if request.method == "GET":
         return render_template(
-            "create_solution.html", selected="solutions", session=session["token"]
+            "create_solution.html",
+            selected="solutions",
+            playbooks=playbooks,
+            var_groups=var_groups,
+            session=session["token"],
         )
     elif request.method == "POST":
         solution = Solution(creator=g.user)
@@ -177,7 +250,12 @@ def create_solution():
         )
         db.session.add(solution)
         db.session.commit()
-        return render_template("create_solution.html", selected="solutions")
+        return render_template(
+            "create_solution.html",
+            selected="solutions",
+            playbooks=playbooks,
+            session=session["token"],
+        )
 
 
 @main.route("/solutions/search", methods=["POST"])
@@ -245,7 +323,13 @@ def var_group(id):
 @main.route("/var_groups/create", methods=["GET", "POST"])
 def create_var_group():
     if request.method == "GET":
-        return render_template("create_var_group.html", selected="var_groups")
+        playbooks = Playbook.query.all()
+        return render_template(
+            "create_var_group.html",
+            selected="var_groups",
+            session=session["token"],
+            playbooks=playbooks,
+        )
     elif request.method == "POST":
         var_group = VariableGroup(creator=g.user)
         var_group.check_import_app(

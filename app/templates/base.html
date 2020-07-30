@@ -19,6 +19,8 @@
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
 
+    <!-- Bootsrap Toggle -->
+    <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
     <!-- Font Awesome JS -->
     <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/solid.js"
         integrity="sha384-tzzSw1/Vo+0N5UhStP3bvwWPq+uvzCMfrN1fEFe+xBmv1C/AtVX5K0uZtmcHitFZ"
@@ -60,6 +62,9 @@
                             <li>
                                 <a href="{{ url_for('main.bulk_alerts') }}">Bulk Import</a>
                             </li>
+                            <li>
+                                <a href="{{ url_for('main.bulk_select_alerts') }}">Bulk Select Solution</a>
+                            </li>
                         </ul>
                 </li>
                 <li>
@@ -97,9 +102,9 @@
                 </li>
                 <li>
                     {% if 'playbooks' in selected %}
-                    <a href="{{ url_for('main.list_playbooks') }}" aria-expanded="true" >Playbooks</a>
+                    <a href="{{ url_for('main.list_playbooks') }}" aria-expanded="true">Playbooks</a>
                     {% else %}
-                    <a href="{{ url_for('main.list_playbooks') }}" aria-expanded="false" >Playbooks</a>
+                    <a href="{{ url_for('main.list_playbooks') }}" aria-expanded="false">Playbooks</a>
                     {% endif %}
                 </li>
             </ul>
@@ -158,6 +163,14 @@
         $(document).ready(function () {
             var session = '{{ session }}'
 
+            $('input').on('keydown', function (event) {
+                var x = event.which;
+                if (x === 13) {
+                    event.preventDefault();
+                }
+            });
+
+
             $("#sidebar").mCustomScrollbar({
                 theme: "minimal"
             });
@@ -166,6 +179,40 @@
                 $('#sidebar, #content').toggleClass('active');
                 $('.collapse.in').toggleClass('in');
                 $('a[aria-expanded=true]').attr('aria-expanded', 'false');
+            });
+
+            $('#variables').on('click', '*[id*=delete_key_value_pair]', function () {
+                var id = parseInt($(this).attr('id').replace('delete_key_value_pair_', ''));
+                var last_row = $('*[id*=variables_row_]:last');
+                last_row.remove();
+            });
+
+
+            $('#add_key_value_pair').on('click', function () {
+                var last_row = $('*[id*=variables_row_]:last');
+                var last_row_id = parseInt(last_row.attr('id').replace("variables_row_", ""))
+                var next_row_id = last_row_id + 1;
+                var new_row = last_row.clone().prop('id', 'variables_row_' + next_row_id);
+                new_row.find('input[name=var_type_option_' + last_row_id + ']').prop('name', 'var_type_option_' + next_row_id);
+                new_row.find('input[id*=key_]:last').prop('id', 'key_' + next_row_id).val('');
+                new_row.find('label[for*=key_]:last').prop('for', 'key_' + next_row_id);
+                new_row.find('input[id*=value_]:last').prop('id', 'value_' + next_row_id).val('');
+                new_row.find('label[for*=value_]:last').prop('for', 'value_' + next_row_id);
+                new_row.find('input[id*=path_]:last').prop('id', 'path_' + next_row_id).val('');
+                new_row.find('label[for*=path_]:last').prop('for', 'path_' + next_row_id);
+                new_row.find('input[id*=fixed_]:last').prop('id', 'fixed_' + next_row_id).val('');
+                new_row.find('label[for*=fixed_]:last').prop('for', 'fixed_' + next_row_id);
+                var delete_buttons = $('*[id*=delete_key_value_pair_]:last');
+                var delete_button_html = ''
+                if (delete_buttons.length == 0) {
+                    delete_button_html = '<div class="col-sm-2"><button id="delete_key_value_pair_2" type="button" class="btn btn-danger" style="margin-top: 38px;">&#x2212;</button></div>'
+                    new_row.append(delete_button_html);
+                }
+                else {
+                    new_row.find('button[id*=delete_key_value_pair]').prop('id', 'delete_key_value_pair_' + next_row_id);
+                }
+
+                last_row.after(new_row)
             });
 
             $('#solution_button').on('click', function () {
@@ -193,9 +240,10 @@
                     $('#solution_select').show()
                 }
             });
-            $('#alert_field').on('keyup', function () { 
+
+            $('#alert_field').on('keyup', function () {
                 var query = $('select#alert_select').children().length
-                
+
                 $.ajax({
                     headers: {
                         "Authorization": "Basic " + btoa(session + ":")
@@ -209,40 +257,32 @@
                         solSelect.append('<option selected for="solutionSel">Select Solution</option>');
                         $.each(solutions, function (i, solution) {
                             var name = solution.name.toLowerCase()
-                            if (name.includes(query.toLowerCase())){
+                            if (name.includes(query.toLowerCase())) {
                                 solSelect.append('<option value="' + solution.id + '">' + solution.name + '</option>');
-                            }  
+                            }
                         })
                     }
                 })
             });
 
-            $('#var_playbook_button').on('click', function () {
-                var select = $('select#var_group_select').children().length
-                if (select <= 0) {
-                    $.ajax({
-                        headers: {
-                            "Authorization": "Basic " + btoa(session + ":")
-                        },
-                        type: 'GET',
-                        url: '{{ url_for("playbooks.get_playbooks") }}',
-                        success: function (playbooks) {
-                            $('#var_playbook_button').parent().append('<select id="var_playbook_select" form="updateUserForm" name="var_playbook_select" class="browser-default custom-select"></select>');
-                            $('#var_playbook_button').hide()
-                            var solSelect = $('#var_playbook_select')
-                            solSelect.append('<option selected for="solutionSel">Select Playbook</option>');
-                            $.each(playbooks, function (i, playbook) {
-                                solSelect.append('<option value="' + playbook.id + '">' + playbook.name + '</option>');
-                            })
-                            
-                        }
-                    })
+            $('#var_alert_search_button').on("click", function () {
+                if ($('#dataPrint') !== null) {
+                    $('#dataPrint').remove()
                 }
-                else {
-                    $('#var_playbook_button').hide()
-                    $('#var_playbook_select').show()
-                }
+                var alertId = $('#var_alert_search').val();
+                $.ajax({
+                    headers: {
+                        "Authorization": "Basic " + btoa(session + ":")
+                    },
+                    type: 'GET',
+                    url: '{{ url_for("alerts.get_alerts") }}' + alertId,
+                    success: function (alert) {
+                        $('#var_alert_search_button').parent().parent().after('<div id="dataPrint" class="form-group"><label>' + JSON.stringify(JSON.parse(alert.data), null, 4) + '</label></div>');
+                    }
+                })
             });
+
+
             $('#var_var_group_button').on('click', function () {
                 var select = $('select#var_group_select').children().length
                 if (select <= 0) {
@@ -260,7 +300,6 @@
                             $.each(playbooks, function (i, playbook) {
                                 solSelect.append('<option value="' + playbook.id + '">' + playbook.name + '</option>');
                             })
-
                         }
                     })
                 }
@@ -268,6 +307,100 @@
                     $('#var_var_group_button').hide()
                     $('#var_var_group_select').show()
                 }
+            });
+
+            $('#var_load_vars_button').on('click', function () {
+                if ($('#varsPrint') !== null) {
+                    $('#varsPrint').remove()
+                }
+                var selected = $('#var_playbook_select').children("option:selected").val();
+                $.ajax({
+                    headers: {
+                        "Authorization": "Basic " + btoa(session + ":")
+                    },
+                    type: 'GET',
+                    url: '{{ url_for("playbooks.get_playbooks") }}' + selected,
+                    success: function (playbook) {
+                        $('#var_alert_search_button').parent().parent().after('<div id="varsPrint" class="form-group"><label>' + playbook.extra_vars + '</label></div>');
+                    }
+                })
+
+            });
+
+
+            $('#alert_bulk_select').on('click', function () {
+                var query = $("#selectAlertsQuery").val()
+                $.ajax({
+                    headers: {
+                        "Authorization": "Basic " + btoa(session + ":")
+                    },
+                    data: { "query": query },
+                    type: 'POST',
+                    url: '{{ url_for("alerts.bulk_search") }}',
+                    success: function (alerts) {
+                        if ($('#selected_alerts_table') !== null) {
+                            $('#selected_alerts_table').remove()
+                        }
+
+                        $('#alert_bulk_select').parent().parent().parent().parent().append('<table id=selected_alerts_table class="table table-bordered"><thead><tr><th scope="col">#</th><th scope="col">ID</th><th scope="col">Name</th><th scope="col">Solution</th><th scope="col">URL</th></tr></thead><tbody></tbody></table>')
+                        var table = $('#selected_alerts_table').find("tbody")
+                        $.each(alerts, function (i, alert) {
+                            table.parent().append('<tr><th scope="row"> <input type="checkbox" checked=true name="selected" value="' + alert.id + '"> </th><td>' + alert.id + '</td><td>' + alert.name + '</td><td>' + alert.solution_id + '</td><td><a href="' + alert.location + '">View</a></td></tr>')
+                        })
+                        $('#alert_bulk_select_solution').show()
+                        $('#alert_bulk_select_export').show()
+                    }
+                })
+            });
+
+            $('#alert_bulk_select_export').on('click', function () {
+
+                alerts = []
+
+                $.each($("input[type='checkbox']:checked"), function () {
+                    alerts.push($(this).val());
+                });
+
+                data = { 'alerts': JSON.stringify(alerts) }
+
+                $.ajax({
+                    headers: {
+                        "Authorization": "Basic " + btoa(session + ":")
+                    },
+                    data: { 'alerts': JSON.stringify(alerts) },
+                    type: 'POST',
+                    url: '{{ url_for("main.bulk_select_alerts_download") }}',
+                    success: function (csv) {
+                        var hiddenElement = document.createElement('a');
+                        hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
+                        hiddenElement.target = '_blank';
+                        var dt = new Date();
+                        var time = dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds();
+                        hiddenElement.download = 'alerts_' + time + '.csv';
+                        hiddenElement.click();
+                    }
+                })
+            });
+
+            $('#alert_bulk_select_solution').on('click', function () {
+                if ($('#solution_select') !== null) {
+                    $('#solution_select').remove()
+                }
+                $.ajax({
+                    headers: {
+                        "Authorization": "Basic " + btoa(session + ":")
+                    },
+                    type: 'GET',
+                    url: '{{ url_for("solutions.get_solutions") }}',
+                    success: function (solutions) {
+                        $('#alert_bulk_select_solution').parent().append('<select id="solution_select"  style="width: 50%;" form="updateUserForm" name="solution_select" class="browser-default custom-select"></select>');
+                        var solSelect = $('#solution_select')
+                        solSelect.append('<option selected for="solutionSel">Select Solution</option>');
+                        $.each(solutions, function (i, solution) {
+                            solSelect.append('<option value="' + solution.id + '">' + solution.name + '</option>');
+                        })
+                    }
+                })
             });
 
             $('#alertUpdateBtn').on('click', function () {

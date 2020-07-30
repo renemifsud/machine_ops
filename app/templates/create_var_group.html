@@ -3,27 +3,83 @@
 {% block main_content %}
 
 <form action="{{ url_for('main.create_var_group') }}" method="POST">
-    <h2>Create Solution</h2>
+    <h2>Create Variable Group</h2>
     <div class="form-group">
         <label for="forName">Name</label>
         <input type="text" class="form-control" id="forName" aria-describedby="nameHelp" name="name">
-        <small id="nameHelp" class="form-text text-muted">Set any name for the solution</small>
+        <small id="nameHelp" class="form-text text-muted">Set any name for the group</small>
     </div>
-    <div class="form-group">
-        <label for="forData">Playbook</label>
-        <textarea class="form-control" id="forData" name="playbook" aria-describedby="dataHelp" rows="3"></textarea>
-        <small id="dataHelp" class="form-text text-muted">The data posted by the alert</small>
+    <div class="form-group row">
+        <label for="var_playbook" class="col-sm-4 col-form-label">Playbook</label>
+        <div class="col-sm-4" form="updateUserForm">
+            <select id="var_playbook_select" form="updateUserForm" name="var_playbook_select"
+                class="browser-default custom-select">
+                <option selected for="playbookSel">Select Playbook</option>
+
+                {% for playbook in playbooks %}
+                <option value="{{ playbook.id }}"> {{ playbook.name }} </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-sm-4">
+            <button type="button" id="var_load_vars_button" class="btn btn-primary">Load variables</button>
+        </div>
     </div>
-    <div class="form-group">
-        <label for="forVars">Variables</label>
-        <input type="text" class="form-control" id="forName" aria-describedby="nameHelp" name="var_list">
-        <small id="nameHelp" class="form-text text-muted">Enter the variable names that are needed by the playbook
-            seperated by a comma</small>
+    <div class="form-group row">
+        <label for="var_alert" class="col-sm-4 col-form-label">Alert</label>
+        <div class="col-sm-4">
+            <input type="text" class="form-control" id="var_alert_search" aria-describedby="nameHelp">
+            <small class="form-text text-muted">Select an alert id. The alert will not be binded with the
+                Variable Group</small>
+        </div>
+        <div class="col-sm-4">
+            <button type="button" id="var_alert_search_button" class="btn btn-primary">Load body</button>
+        </div>
+
     </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
-    </form>
-    {% endif %}
+    <div id="variables">
+        <div id="variables_head_row" class="form-group row">
+            <label class="col-sm-12 ">Variables</label>
+        </div>
+        <div id="variables_row_1" class="form-group row">
+            <div class="col-sm-5">
+                <label for='var_alert_search' class="col-form-label">Key</label>
+
+                <input type="text" class="form-control" id="key_1" aria-describedby="nameHelp">
+                <small class="form-text text-muted">The key must be the same name as used in the playbook</small>
+            </div>
+            <div class="col-sm-5">
+                <label for='value_1' class="col-form-label">Value</label>
+                <input type="text" class="form-control" id="value_1" aria-describedby="nameHelp">
+
+                <div class="form-check form-check-inline">
+                    <input type="radio" class="form-check-input" id="path_1" name="var_type_option_1">
+                    <label class="form-check-label" for="path_1">Path</label>
+                </div>
+
+                <div class="form-check form-check-inline">
+                    <input type="radio" class="form-check-input" id="fixed_1" name="var_type_option_1">
+                    <label class="form-check-label" for="fixed_1">Fixed</label>
+                </div>
+                <small class="form-text text-muted">Choose between a fixed value or a path in the alert JSON</small>
+            </div>
+
+        </div>
+        <div class="form-group row">
+            <div class="col-sm-10">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+
+            <div class="col-sm-2">
+                <button id="add_key_value_pair" type="button" class="btn btn-success"
+                    style="margin-top: -38px;">&#43;</button>
+            </div>
+        </div>
+    </div>
+
+</form>
 
 
 
-    {% endblock %}
+
+{% endblock %}

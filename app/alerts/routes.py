@@ -13,9 +13,32 @@ def before_request():
     pass
 
 
-@alerts.route("/alerts/", methods=["GET"])
+@alerts.route("/alerts/", methods=["GET", "POST"])
 def get_alerts():
-    return jsonify({"alerts": [alert.get_url() for alert in Alert.query.all()]})
+    if request.method == "GET":
+        return jsonify([alert.export_data() for alert in Alert.query.all()])
+    if request.method == "POST":
+        alert = Alert(creator=g.user)
+        alert.check_import(request.json)
+        db.session.add(alert)
+        db.session.commit()
+        return jsonify({}), 201, {"Location": alert.get_url()}
+
+
+@alerts.route("/alerts/bulk_search", methods=["POST"])
+def bulk_search():
+    if request.method == "POST":
+        query = request.form["query"]
+        query = "%{}%".format(query)
+        return (
+            jsonify(
+                [
+                    alert.export_data()
+                    for alert in Alert.query.filter(Alert.data.like(query)).all()
+                ]
+            ),
+            200,
+        )
 
 
 @alerts.route("/alerts/<int:id>", methods=["GET", "DELETE"])
@@ -27,11 +50,3 @@ def get_alert(id):
         db.session.delete(alert)
         db.session.commit()
 
-
-@alerts.route("/alerts", methods=["POST"])
-def new_alert():
-    alert = Alert(creator=g.user)
-    alert.check_import(request.json)
-    db.session.add(alert)
-    db.session.commit()
-    return jsonify({}), 201, {"Location": alert.get_url()}

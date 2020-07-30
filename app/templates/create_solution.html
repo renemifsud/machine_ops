@@ -10,25 +10,25 @@
         <small id="nameHelp" class="form-text text-muted">Set any name for the solution</small>
     </div>
     <div class="form-group row">
-        <label for="var_playbook" class="col-sm-4 col-form-label">Playbook</label>
-        <div class="col-sm-8" form="updateUserForm">
-            {% if playbook %}
-            <input type="text" readonly class="form-control-plaintext" id="var_playbook" value="{{ playbook.name }}">
-            <input type="button" class="btn btn-dark" value="Change" id="var_playbook_button">
-            {% else %}
-            <input type="button" class="btn btn-dark" value="Change" id="var_playbook_button">
-            {% endif %}
+        <label for="sol_playbook" class="col-sm-4 col-form-label">Playbook</label>
+        <div class="col-sm-4" form="updateUserForm">
+            <select id="sol_playbook_select" name="sol_playbook_select" class="browser-default custom-select">
+                <option selected for="playbookSel">Select Playbook</option>
+                {% for playbook in playbooks %}
+                <option value="{{ playbook.id }}"> {{ playbook.name }} </option>
+                {% endfor %}
+            </select>
         </div>
     </div>
     <div class="form-group row">
-        <label for="var_var_group" class="col-sm-4 col-form-label">Variable Group</label>
-        <div class="col-sm-8" form="updateUserForm">
-            {% if var_group %}
-            <input type="text" readonly class="form-control-plaintext" id="var_var_group" value="{{ playbook.name }}">
-            <input type="button" class="btn btn-dark" value="Change" id="var_var_group_button">
-            {% else %}
-            <input type="button" class="btn btn-dark" value="Change" id="var_var_group_button">
-            {% endif %}
+        <label for="sol_var_group" class="col-sm-4 col-form-label">Variable Group</label>
+        <div class="col-sm-4" form="updateUserForm">
+            <select id="sol_var_group_select" name="sol_var_group_select" class="browser-default custom-select">
+                <option selected for="playbookSel">Select Variable Group</option>
+                {% for var_group in var_group %}
+                <option value="{{ var_group.id }}"> {{ var_group.name }} </option>
+                {% endfor %}
+            </select>
         </div>
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>

@@ -17,6 +17,13 @@
             "request": "launch",
             "program": "/root/machine_ops/infrastructure/master_publisher.py",
             "console": "integratedTerminal"
+        },
+        {
+            "name": "Python: Run Playbook",
+            "type": "python",
+            "request": "launch",
+            "program": "/root/machine_ops/awx/__init__.py",
+            "console": "integratedTerminal"
         }
     ]
 }
