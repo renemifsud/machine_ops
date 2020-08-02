@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block main_content %}
+
+
+
+<form action="{{ url_for('main.settings') }}" method="post">
+    <h2>Models</h2>
+    <div class="form-group row">
+        <label for="staticSolution" class="col-sm-5 col-form-label">Active algorithm type</label>
+        <div class="col-sm-5" form="updateUserForm">
+            {% if algorithm_type %}
+            <input type="text" readonly class="form-control-plaintext" id="staticAlgorithmType"
+                value="{{ algorithm_type.name }}">
+            <input type="button" class="btn btn-dark" value="Change" id="active_algo_type_button">
+            {% else %}
+            <input type="button" class="btn btn-dark" value="Change" id="active_algo_type_button">
+            {% endif %}
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="staticSolution" class="col-sm-5 col-form-label">Active model</label>
+        <div class="col-sm-5" form="updateUserForm">
+            {% if model %}
+            <input type="text" readonly class="form-control-plaintext" id="staticAlgorithmType"
+                value="{{ model.name }}">
+            <input type="button" class="btn btn-dark" value="Change" id="solution_button">
+            {% else %}
+            <input type="button" class="btn btn-dark" value="Change" id="solution_button">
+            {% endif %}
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-danger">Save</button>
+</form>
+
+
+
+{% endblock %}

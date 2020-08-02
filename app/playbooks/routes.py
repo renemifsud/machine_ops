@@ -14,7 +14,7 @@ def before_request():
     pass
 
 
-@playbooks.route("/playbooks/", methods=["GET", "POST"])
+@playbooks.route("/playbooks", methods=["GET", "POST"])
 def get_playbooks():
     if request.method == "GET":
         if request.args:

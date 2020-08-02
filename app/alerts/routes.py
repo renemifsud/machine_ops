@@ -2,6 +2,7 @@ from flask import jsonify, request, g, Blueprint
 from app import db
 from ..models import Alert
 from app.auth import auth_token
+import json
 
 alerts = Blueprint("alerts", __name__)
 
@@ -50,3 +51,12 @@ def get_alert(id):
         db.session.delete(alert)
         db.session.commit()
 
+
+@alerts.route("/alerts/bulk_set_solution", methods=["POST"])
+def alert_set_bulk_solution():
+    for alert_id in json.loads(request.form["alerts"]):
+        Alert.query.filter_by(id=alert_id).update(
+            {"solution_id": request.form["solution_id"]}
+        )
+        db.session.commit()
+    return jsonify("Alerts updated"), 204

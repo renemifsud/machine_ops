@@ -2,7 +2,7 @@
 
 {% block main_content %}
 
-<form action="{{ url_for('main.create_var_group') }}" method="POST">
+<form id="create_var_group_form" action="{{ url_for('main.create_var_group') }}" method="POST">
     <h2>Create Variable Group</h2>
     <div class="form-group">
         <label for="forName">Name</label>
@@ -28,7 +28,7 @@
     <div class="form-group row">
         <label for="var_alert" class="col-sm-4 col-form-label">Alert</label>
         <div class="col-sm-4">
-            <input type="text" class="form-control" id="var_alert_search" aria-describedby="nameHelp">
+            <input type="text" class="form-control" id="var_alert_search">
             <small class="form-text text-muted">Select an alert id. The alert will not be binded with the
                 Variable Group</small>
         </div>
@@ -43,22 +43,23 @@
         </div>
         <div id="variables_row_1" class="form-group row">
             <div class="col-sm-5">
-                <label for='var_alert_search' class="col-form-label">Key</label>
+                <label class="col-form-label">Key</label>
 
-                <input type="text" class="form-control" id="key_1" aria-describedby="nameHelp">
+                <input type="text" class="form-control" name="key_1" form="create_var_group_form">
                 <small class="form-text text-muted">The key must be the same name as used in the playbook</small>
             </div>
             <div class="col-sm-5">
                 <label for='value_1' class="col-form-label">Value</label>
-                <input type="text" class="form-control" id="value_1" aria-describedby="nameHelp">
+                <input type="text" class="form-control" name="value_1" form="create_var_group_form">
 
                 <div class="form-check form-check-inline">
-                    <input type="radio" class="form-check-input" id="path_1" name="var_type_option_1">
+                    <input type="radio" class="form-check-input" id="path_1" name="var_type_option_1" value="path">
                     <label class="form-check-label" for="path_1">Path</label>
                 </div>
 
                 <div class="form-check form-check-inline">
-                    <input type="radio" class="form-check-input" id="fixed_1" name="var_type_option_1">
+                    <input type="radio" class="form-check-input" id="fixed_1" name="var_type_option_1" value="fixed"
+                        checked>
                     <label class="form-check-label" for="fixed_1">Fixed</label>
                 </div>
                 <small class="form-text text-muted">Choose between a fixed value or a path in the alert JSON</small>
@@ -67,7 +68,7 @@
         </div>
         <div class="form-group row">
             <div class="col-sm-10">
-                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="submit" class="btn btn-primary" form="create_var_group_form">Submit</button>
             </div>
 
             <div class="col-sm-2">

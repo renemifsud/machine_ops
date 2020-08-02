@@ -1,5 +1,5 @@
 import json, random
-from app import db
+from app import db, datasets_dir
 import datetime
 import jwt
 from flask import url_for, current_app, jsonify
@@ -33,7 +33,7 @@ class Alert(db.Model):
             "solved": self.solved,
             "solution_id": self.solution_id,
             "name": self.name,
-            "location": self.get_app_url()
+            "location": self.get_app_url(),
         }
 
     def check_import(self, data, name=None, solution_id=None, solved=False):
@@ -63,6 +63,8 @@ class User(db.Model):
     password_hash = db.Column(db.String(100))
     email = db.Column(db.String(30), index=True, unique=True)
     alerts = db.relationship("Alert", backref="creator", lazy="dynamic")
+    var_groups = db.relationship("VariableGroup", backref="creator", lazy="dynamic")
+    solutions = db.relationship("Solution", backref="creator", lazy="dynamic")
     __searchable__ = ["id", "username", "email"]
 
     def set_password(self, password):
@@ -115,11 +117,13 @@ class Solution(db.Model):
     name = db.Column(db.String(200), unique=False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), index=True)
     playbook_id = db.Column(db.Integer, db.ForeignKey("playbooks.id"), index=True)
+    var_group_id = db.Column(
+        db.Integer, db.ForeignKey("variable_groups.id"), index=True
+    )
     created = db.Column(UtcDateTime(), nullable=False, default=utcnow())
     modified = db.Column(UtcDateTime(), nullable=False, default=utcnow())
     last_job_run = db.Column(UtcDateTime(), nullable=False, default=utcnow())
 
-    var_groups = db.relationship("VariableGroup", backref="solution", uselist=False)
     alerts = db.relationship("Alert", backref="solution", uselist=False)
     __searchable__ = ["id", "name"]
 
@@ -157,15 +161,11 @@ class Solution(db.Model):
             raise ValidationError("Invalid 'Solution', missing " + e.args[0])
         return self
 
-    def check_import_app(self, name, playbook, alert):
+    def check_import_app(self, name, playbook_id, var_group_id):
         try:
-            self.playbook = playbook
+            self.playbook_id = playbook_id
+            self.var_group_id = var_group_id
             self.name = name
-            var_list = [
-                "".join(e for e in var if e.isalnum())
-                for var in var_list.split(""",""")
-            ]
-            self.var_list = json.dumps(var_list)
         except KeyError as e:
             raise ValidationError("Invalid 'Solution', missing " + e.args[0])
         return self
@@ -247,26 +247,24 @@ class Playbook(db.Model):
 class VariableGroup(db.Model):
     __tablename__ = "variable_groups"
     id = db.Column(db.Integer, primary_key=True)
-    solution_id = db.Column(db.Integer, db.ForeignKey("solutions.id"), index=True)
-    alert_id = db.Column(db.Integer, db.ForeignKey("alerts.id"), index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), index=True)
     name = db.Column(db.String(200), unique=False)
+    variables = db.Column(db.String(200), unique=False)
     created = db.Column(UtcDateTime(), nullable=False, default=utcnow())
     modified = db.Column(UtcDateTime(), nullable=False, default=utcnow())
-
-    variables = db.relationship("Variable", backref="parent_group", uselist=False)
-    __searchable__ = ["id", "name", "solution_id"]
+    __searchable__ = ["id", "name"]
 
     def get_url(self):
         return url_for("var_groups.get_var_groups", id=self.id, _external=True)
 
     def get_app_url(self):
-        return url_for("main.get_var_groups", id=self.id, _external=True)
+        return url_for("main.var_group", id=self.id, _external=True)
 
     def export_data(self):
         return {
             "id": self.id,
             "name": self.name,
-            "alert_id": self.alert_id,
+            "user_id": self.user_id,
             "created": self.created,
         }
 
@@ -274,14 +272,6 @@ class VariableGroup(db.Model):
         try:
             self.name = obj["name"]
 
-            if obj["solution_id"]:
-                self.solution_id = obj["solution_id"]
-            else:
-                self.last_job_run = None
-            if obj["alert_id"]:
-                self.solution_id = obj["alert_id"]
-            else:
-                self.last_job_run = None
             if obj["created"]:
                 self.created = dateutil.parser.parse(obj["created"])
             else:
@@ -295,28 +285,98 @@ class VariableGroup(db.Model):
             raise ValidationError("Invalid 'Solution', missing " + e.args[0])
         return self
 
-    def check_import_app(self, name, playbook, var_list):
+    def check_import_app(self, name, variables):
         try:
-            self.playbook = playbook
             self.name = name
-            var_list = [
-                "".join(e for e in var if e.isalnum())
-                for var in var_list.split(""",""")
-            ]
-            self.var_list = json.dumps(var_list)
+            self.variables = json.dumps(variables)
         except KeyError as e:
             raise ValidationError("Invalid 'Playbook', missing " + e.args[0])
         return self
 
 
-class Variable(db.Model):
-    __tablename__ = "variables"
+class MlModels(db.Model):
+    __tablename__ = "ml_models"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), index=True)
+    algorithm_id = db.Column(db.Integer, db.ForeignKey("algorithms.id"), index=True)
+    data = db.Column(db.LargeBinary)
+    created = db.Column(UtcDateTime(), nullable=False, default=utcnow())
+    __searchable__ = ["id"]
+
+    def get_url(self):
+        return url_for("ml_models.get_ml_models", id=self.id, _external=True)
+
+    def export_data(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "created": self.created,
+        }
+
+    def check_import(self, data):
+        try:
+            self.data = data
+        except KeyError as e:
+            raise ValidationError("Invalid 'Playbook', missing " + e.args[0])
+        return self
+
+
+class Algorithms(db.Model):
+    __tablename__ = "algorithms"
+    id = db.Column(db.Integer, primary_key=True)
+    config = db.Column(db.String(200), unique=False)
+    type_id = db.Column(db.Integer, db.ForeignKey("algorithms_types.id"), index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), index=True)
+    created = db.Column(UtcDateTime(), nullable=False, default=utcnow())
+    ml_models = db.relationship("MlModels", backref="algorithm", uselist=False)
+
+    __searchable__ = ["id"]
+
+    def get_url(self):
+        return url_for("ml_models.get_ml_models", id=self.id, _external=True)
+
+    def export_data(self):
+        return {
+            "id": self.id,
+            "config": self.config,
+            "created": self.created,
+        }
+
+    def check_import_app(self, config: dict):
+        try:
+            self.config = json.dumps(config)
+        except KeyError as e:
+            raise ValidationError("Invalid 'Playbook', missing " + e.args[0])
+        return self
+
+
+class AlgorithmsTypes(db.Model):
+    __tablename__ = "algorithms_types"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), unique=False)
-    path = db.Column(db.String(200), unique=False)
-    var_group_id = db.Column(
-        db.Integer, db.ForeignKey("variable_groups.id"), index=True
-    )
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), index=True)
+    params = db.Column(db.String(200), unique=False)
     created = db.Column(UtcDateTime(), nullable=False, default=utcnow())
-    modified = db.Column(UtcDateTime(), nullable=False, default=utcnow())
-    __searchable__ = ["id", "name", "var_group_id"]
+    algorithms = db.relationship("Algorithms", backref="type", uselist=False)
+    __searchable__ = ["id"]
+
+    def get_url(self):
+        return url_for("ml_models.get_ml_models", id=self.id, _external=True)
+
+    def set_params(self, *args):
+        self.params = json.dumps(args)
+
+    def export_data(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "params": self.params,
+            "created": self.created,
+        }
+
+    def check_import_app(self, name, config):
+        try:
+            self.name = name
+        except KeyError as e:
+            raise ValidationError("Invalid 'Playbook', missing " + e.args[0])
+        return self

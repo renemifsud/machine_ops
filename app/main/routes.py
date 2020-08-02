@@ -13,7 +13,7 @@ from flask import (
     make_response,
 )
 from app import db
-from app.models import User, Alert, Solution, Playbook, VariableGroup
+from app.models import User, Alert, Solution, Playbook, VariableGroup, Algorithms, AlgorithmsTypes
 from app.alerts.forms import CreateAlert
 import json, csv
 from sqlalchemy import exc
@@ -164,15 +164,11 @@ def bulk_select_alerts_download():
     for alert in alerts:
         alert = Alert.query.filter_by(id=alert).first()
         line = [
-            str(alert.id)
-            ,
-            str(alert.data)
-            ,
-            str(alert.user_id)
-            ,
-            str(alert.name)
-            ,
-            str(alert.solution_id)
+            str(alert.id),
+            str(alert.data),
+            str(alert.user_id),
+            str(alert.name),
+            str(alert.solution_id),
         ]
         writer.writerow(line)
     output.seek(0)
@@ -246,7 +242,9 @@ def create_solution():
     elif request.method == "POST":
         solution = Solution(creator=g.user)
         solution.check_import_app(
-            request.form["name"], request.form["playbook"], request.form["var_list"]
+            request.form["name"],
+            request.form["sol_playbook_select"],
+            request.form["sol_var_group_select"],
         )
         db.session.add(solution)
         db.session.commit()
@@ -315,9 +313,9 @@ def list_var_groups():
 
 @main.route("/var_groups/<int:id>", methods=["GET"])
 def var_group(id):
-    group = VariableGroup.query.get_or_404(id)
-    if group:
-        return render_template("var_group.html", group=group)
+    var_group = VariableGroup.query.get_or_404(id)
+    if var_group:
+        return render_template("var_group.html", var_group=var_group)
 
 
 @main.route("/var_groups/create", methods=["GET", "POST"])
@@ -332,9 +330,20 @@ def create_var_group():
         )
     elif request.method == "POST":
         var_group = VariableGroup(creator=g.user)
-        var_group.check_import_app(
-            request.form["name"], request.form["playbook"], request.form["var_list"]
-        )
+        variables = {}
+        counter = 0
+        while True:
+            counter += 1
+            key = "key_" + str(counter)
+            if key in request.form:
+                variables[key] = {
+                    "value": request.form["value_" + str(counter)],
+                    "type": request.form["var_type_option_" + str(counter)],
+                }
+            else:
+                break
+
+        var_group.check_import_app(request.form["name"], variables)
         db.session.add(var_group)
         db.session.commit()
         return render_template("create_var_group.html", selected="var_groups")
@@ -356,3 +365,25 @@ def search_var_groups():
     return render_template(
         "list_var_groups.html", var_group=var_group, selected="groups"
     )
+
+
+@main.route("/settings", methods=["GET"])
+def settings():
+    return render_template(
+        "settings.html", selected="settings", session=session["token"]
+    )
+
+
+@main.route("/models", methods=["GET"])
+def list_models():
+    return render_template(
+        "models.html", selected="models", session=session["token"]
+    )
+    
+@main.route("/models/train", methods=["GET"])
+def train_models():
+    algo_types = AlgorithmsTypes.query.all()
+    return render_template(
+        "models.html", selected="models", algo_types=algo_types, session=session["token"]
+    )
+

@@ -16,6 +16,10 @@ import flask_whooshalchemy as wa
 from flask_apscheduler import APScheduler
 from awx import AwxController
 
+
+datasets_dir = None
+
+
 db = SQLAlchemy()
 awx = None
 
@@ -26,6 +30,15 @@ def get_config_file(config_name):
 
 def create_app(config_name):
     app = Flask(__name__)
+
+    datasets_dir = os.path.join(app.instance_path, "datasets")
+    try:
+        os.makedirs(datasets_dir)
+    except FileExistsError as err:
+        print("datasets folder already created")
+        
+
+
     Bootstrap(app)
     app.config.from_pyfile(get_config_file(config_name))
     app.secret_key = "not so secret"
@@ -40,7 +53,15 @@ def create_app(config_name):
         supports_credentials=True,
     )
 
-    from .models import User, Alert, Solution, Playbook, VariableGroup, Variable
+    from .models import (
+        User,
+        Alert,
+        Solution,
+        Playbook,
+        VariableGroup,
+        Algorithms,
+        AlgorithmsTypes,
+    )
 
     with app.app_context():
         db.init_app(app)
@@ -52,12 +73,18 @@ def create_app(config_name):
             db.session.add(u)
             db.session.commit()
 
+        if AlgorithmsTypes.query.get(1) is None:
+            at = AlgorithmsTypes(name="fasttext")
+            at.set_params("lr", "epoch", "wordNgrams")
+            db.session.add(at)
+            db.session.commit()
+
         wa.whoosh_index(app, User)
         wa.whoosh_index(app, Alert)
+
         wa.whoosh_index(app, Solution)
         wa.whoosh_index(app, Playbook)
         wa.whoosh_index(app, VariableGroup)
-        wa.whoosh_index(app, Variable)
 
     scheduler = APScheduler()
     scheduler.init_app(app)
@@ -114,6 +141,10 @@ def create_app(config_name):
 
     app.register_blueprint(playbooks_bp, url_prefix="/")
 
-    # Jobs
+    from app.algo_types.routes import algo_types as algo_types_bp
+
+    app.register_blueprint(algo_types_bp, url_prefix="/")
+
+
 
     return app

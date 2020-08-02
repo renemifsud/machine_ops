@@ -85,6 +85,7 @@
                             </li>
                         </ul>
                 </li>
+
                 <li>
                     {% if 'var_groups' in selected %}
                     <a href="#var_groupsSubmenu" data-toggle="collapse" aria-expanded="true"
@@ -100,11 +101,38 @@
                             </li>
                         </ul>
                 </li>
+
+                <li>
+                    {% if 'models' in selected %}
+                    <a href="#var_modelsSubmenu" data-toggle="collapse" aria-expanded="true"
+                        class="dropdown-toggle">Models</a>
+                    <ul class="collapse list-unstyled show" id="var_modelsSubmenu">
+                        {% else %}
+                        <a href="#var_modelsSubmenu" data-toggle="collapse" aria-expanded="false"
+                            class="dropdown-toggle">Models</a>
+                        <ul class="collapse list-unstyled" id="var_modelsSubmenu">
+                            {% endif %}
+                            <li>
+                                <a href="{{ url_for('main.list_models') }}">All</a>
+                            </li>
+                            <li>
+                                <a href="{{ url_for('main.train_models') }}">Train</a>
+                            </li>
+                        </ul>
+                </li>
+
                 <li>
                     {% if 'playbooks' in selected %}
                     <a href="{{ url_for('main.list_playbooks') }}" aria-expanded="true">Playbooks</a>
                     {% else %}
                     <a href="{{ url_for('main.list_playbooks') }}" aria-expanded="false">Playbooks</a>
+                    {% endif %}
+                </li>
+                <li>
+                    {% if 'settings' in selected %}
+                    <a href="{{ url_for('main.settings') }}" aria-expanded="true">Settings</a>
+                    {% else %}
+                    <a href="{{ url_for('main.settings') }}" aria-expanded="false">Settings</a>
                     {% endif %}
                 </li>
             </ul>
@@ -194,13 +222,13 @@
                 var next_row_id = last_row_id + 1;
                 var new_row = last_row.clone().prop('id', 'variables_row_' + next_row_id);
                 new_row.find('input[name=var_type_option_' + last_row_id + ']').prop('name', 'var_type_option_' + next_row_id);
-                new_row.find('input[id*=key_]:last').prop('id', 'key_' + next_row_id).val('');
+                new_row.find('input[name*=key_]:last').prop('name', 'key_' + next_row_id).val('');
                 new_row.find('label[for*=key_]:last').prop('for', 'key_' + next_row_id);
-                new_row.find('input[id*=value_]:last').prop('id', 'value_' + next_row_id).val('');
+                new_row.find('input[name*=value_]:last').prop('name', 'value_' + next_row_id).val('');
                 new_row.find('label[for*=value_]:last').prop('for', 'value_' + next_row_id);
-                new_row.find('input[id*=path_]:last').prop('id', 'path_' + next_row_id).val('');
+                new_row.find('input[id*=path_]:last').prop('id', 'path_' + next_row_id);
                 new_row.find('label[for*=path_]:last').prop('for', 'path_' + next_row_id);
-                new_row.find('input[id*=fixed_]:last').prop('id', 'fixed_' + next_row_id).val('');
+                new_row.find('input[id*=fixed_]:last').prop('id', 'fixed_' + next_row_id);
                 new_row.find('label[for*=fixed_]:last').prop('for', 'fixed_' + next_row_id);
                 var delete_buttons = $('*[id*=delete_key_value_pair_]:last');
                 var delete_button_html = ''
@@ -238,6 +266,32 @@
                 else {
                     $('#solution_button').hide()
                     $('#solution_select').show()
+                }
+            });
+
+            $('#active_algo_type_button').on('click', function () {
+                var select = $('select#active_algo_type_select').children().length
+                if (select <= 0) {
+                    $.ajax({
+                        headers: {
+                            "Authorization": "Basic " + btoa(session + ":")
+                        },
+                        type: 'GET',
+                        url: '{{ url_for("algo_types.get_algo_types") }}',
+                        success: function (algo_types) {
+                            $('#active_algo_type_button').parent().append('<select id="active_algo_type_select" form="updateUserForm" name="solution_select" class="browser-default custom-select"></select>');
+                            $('#active_algo_type_button').hide()
+                            var algoTypeSelect = $('#active_algo_type_select')
+                            algoTypeSelect.append('<option selected for="active_algo_type_select">Select type</option>');
+                            $.each(algo_types, function (i, algo_type) {
+                                algoTypeSelect.append('<option value="' + algo_type.id + '">' + algo_type.name + '</option>');
+                            })
+                        }
+                    })
+                }
+                else {
+                    $('#solution_bactive_algo_type_buttonutton').hide()
+                    $('#active_algo_type_select').show()
                 }
             });
 
@@ -319,7 +373,7 @@
                         "Authorization": "Basic " + btoa(session + ":")
                     },
                     type: 'GET',
-                    url: '{{ url_for("playbooks.get_playbooks") }}' + selected,
+                    url: '{{ url_for("playbooks.get_playbooks") }}/' + selected,
                     success: function (playbook) {
                         $('#var_alert_search_button').parent().parent().after('<div id="varsPrint" class="form-group"><label>' + playbook.extra_vars + '</label></div>');
                     }
@@ -327,6 +381,32 @@
 
             });
 
+            $('#model_load_parameters_button').on('click', function () {
+                if ($('#params') !== null) {
+                    $('#params').remove()
+                }
+                var selected = $('#model_load_parameters_select').children("option:selected").val();
+                $.ajax({
+                    headers: {
+                        "Authorization": "Basic " + btoa(session + ":")
+                    },
+                    type: 'GET',
+                    url: '{{ url_for("algo_types.get_algo_types") }}/' + selected,
+                    success: function (algo_type) {
+                        $('#model_load_parameters_button').parent().parent().after().after('<div class="form-group row col-sm-8" id="params"></div>')
+                        var params = $("#params")
+                        console.log(params)
+                        $.each(JSON.parse(algo_type.params), function (i, param) {
+                            params.append('<label class="col-form-label">' + param + '</label>')
+                            params.append('<input type="text" class="form-control" name="' + param + '">')
+                        })
+
+                    }
+                })
+
+            });
+
+            // Searches for alert with string specified in
 
             $('#alert_bulk_select').on('click', function () {
                 var query = $("#selectAlertsQuery").val()
@@ -345,7 +425,7 @@
                         $('#alert_bulk_select').parent().parent().parent().parent().append('<table id=selected_alerts_table class="table table-bordered"><thead><tr><th scope="col">#</th><th scope="col">ID</th><th scope="col">Name</th><th scope="col">Solution</th><th scope="col">URL</th></tr></thead><tbody></tbody></table>')
                         var table = $('#selected_alerts_table').find("tbody")
                         $.each(alerts, function (i, alert) {
-                            table.parent().append('<tr><th scope="row"> <input type="checkbox" checked=true name="selected" value="' + alert.id + '"> </th><td>' + alert.id + '</td><td>' + alert.name + '</td><td>' + alert.solution_id + '</td><td><a href="' + alert.location + '">View</a></td></tr>')
+                            table.parent().append('<tr><th scope="row"> <input type="checkbox" checked=true name="selected" value="' + alert.id + '"> </th><td id="id">' + alert.id + '</td><td>' + alert.name + '</td><td>' + alert.solution_id + '</td><td><a href="' + alert.location + '">View</a></td></tr>')
                         })
                         $('#alert_bulk_select_solution').show()
                         $('#alert_bulk_select_export').show()
@@ -353,16 +433,13 @@
                 })
             });
 
+            // Export CSV of the alerts selected
             $('#alert_bulk_select_export').on('click', function () {
-
                 alerts = []
-
                 $.each($("input[type='checkbox']:checked"), function () {
                     alerts.push($(this).val());
                 });
-
                 data = { 'alerts': JSON.stringify(alerts) }
-
                 $.ajax({
                     headers: {
                         "Authorization": "Basic " + btoa(session + ":")
@@ -383,24 +460,55 @@
             });
 
             $('#alert_bulk_select_solution').on('click', function () {
-                if ($('#solution_select') !== null) {
-                    $('#solution_select').remove()
-                }
-                $.ajax({
-                    headers: {
-                        "Authorization": "Basic " + btoa(session + ":")
-                    },
-                    type: 'GET',
-                    url: '{{ url_for("solutions.get_solutions") }}',
-                    success: function (solutions) {
-                        $('#alert_bulk_select_solution').parent().append('<select id="solution_select"  style="width: 50%;" form="updateUserForm" name="solution_select" class="browser-default custom-select"></select>');
-                        var solSelect = $('#solution_select')
-                        solSelect.append('<option selected for="solutionSel">Select Solution</option>');
-                        $.each(solutions, function (i, solution) {
-                            solSelect.append('<option value="' + solution.id + '">' + solution.name + '</option>');
-                        })
+                current_html = $(this).html()
+                if (current_html.indexOf("Solution") >= 0) {
+                    $.ajax({
+                        headers: {
+                            "Authorization": "Basic " + btoa(session + ":")
+                        },
+                        type: 'GET',
+                        url: '{{ url_for("solutions.get_solutions") }}',
+                        success: function (solutions) {
+                            $('#alert_bulk_select_solution').parent().append('<select id="solution_select"  style="width: 50%;" form="updateUserForm" name="solution_select" class="browser-default custom-select"></select>');
+                            var solSelect = $('#solution_select')
+                            solSelect.append('<option selected for="solutionSel">Select Solution</option>');
+                            $.each(solutions, function (i, solution) {
+                                solSelect.append('<option value="' + solution.id + '">' + solution.name + '</option>');
+                            })
+
+                        }
+                    })
+                    if ($(this).hasClass("btn-success")) {
+                        $(this).removeClass("btn-success").addClass("btn-danger");
                     }
-                })
+                    $(this).html("Bulk Set")
+                }
+                else {
+
+                    alerts = []
+                    $.each($('#selected_alerts_table tr').filter(':has(:checkbox:checked)'), function (i, row) {
+                        alerts.push($(this).find('td[id=id]').text())
+                    });
+                    var selectedSolution = $("select#solution_select").children("option:selected").val();
+
+
+                    data = { 'alerts': JSON.stringify(alerts), 'solution_id': selectedSolution }
+                    console.log(data)
+                    $.ajax({
+                        headers: {
+                            "Authorization": "Basic " + btoa(session + ":")
+                        },
+                        type: 'POST',
+                        data: data,
+                        url: '{{ url_for("alerts.alert_set_bulk_solution") }}',
+                        success: function (solutions) {
+                            location.reload()
+                        }
+                    })
+
+                }
+
+
             });
 
             $('#alertUpdateBtn').on('click', function () {

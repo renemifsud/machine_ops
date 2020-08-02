@@ -2,7 +2,7 @@
 
 {% block main_content %}
 
-{% if var_group.name %}
+{% if var_group %}
 <h2>{{ var_group.name }}</h2>
 {% else %}
 <h2>{{ var_group.id }}</h2>
@@ -12,26 +12,27 @@
     <div class="form-group row">
         <label for="staticId" class="col-sm-2 col-form-label">Group Id</label>
         <div class="col-sm-10">
-            <input type="text" readonly class="form-control-plaintext" id="staticId" value="{{ solution.id }}">
+            <input type="text" readonly class="form-control-plaintext" id="staticId" value="{{ var_group.id }}">
         </div>
     </div>
     <div class="form-group row">
         <label for="staticName" class="col-sm-2 col-form-label">Name</label>
         <div class="col-sm-10">
-            <input type="text" readonly class="form-control-plaintext" id="staticName" value="{{ solution.name }}">
+            <input type="text" readonly class="form-control-plaintext" id="staticName" value="{{ var_group.name }}">
         </div>
     </div>
     <div class="form-group row">
-        <label for="inputCreator" class="col-sm-2 col-form-label">Creator</label>
+        <label for="inputCreator" class="col-sm-2 col-form-label">Variables</label>
         <div class="col-sm-10">
-            <input type="textfield" class="form-control" id="inputCreator" value="{{ var_group.user_id }}">
+            <textarea type="text" class="form-control" id="staticData" name="data"
+                rows="10">{{ var_group.variables }}</textarea>
         </div>
     </div>
-    <div class="form-group row">
+    <!-- <div class="form-group row">
         <label for="inputPaybook" class="col-sm-2 col-form-label">Solution</label>
         <div class="col-sm-10">
             <input type="textfield" class="form-control" id="inputPaybook" value="{{ var_group.solution_id }}">
         </div>
-    </div>
+    </div> -->
 </form>
 {% endblock %}
