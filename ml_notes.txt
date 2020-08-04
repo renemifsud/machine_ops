@@ -1,4 +1,0 @@
-EECM
-Email Evolving Clustering Method 
-fuzzy inference system
-the closer one look at a real-world problem the fuzzier becomes the solution

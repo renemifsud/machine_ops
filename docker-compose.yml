@@ -12,7 +12,7 @@ services:
     container_name: postgres_db
     image: "postgres:9.6.17"
     volumes:
-      - "test_talla:/var/lib/postgresql/data"
+      - "postgres_prod_data:/var/lib/postgresql/data"
     env_file:
       - env_file
     ports:
@@ -28,7 +28,6 @@ services:
     ports:
       - "8000:8000"
     command: /usr/local/bin/gunicorn -w 1 -b :8000 app:create_app()
-    # command: tail -f /dev/null
     restart: always
     depends_on:
       - db
